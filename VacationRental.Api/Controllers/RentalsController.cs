@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using Microsoft.AspNetCore.Mvc;
 using VacationRental.Api.Models;
+using VacationRental.Api.Services;
+using VacationRental.Api.Services.Interface;
 
 namespace VacationRental.Api.Controllers
 {
@@ -11,9 +13,12 @@ namespace VacationRental.Api.Controllers
     {
         private readonly IDictionary<int, RentalViewModel> _rentals;
 
-        public RentalsController(IDictionary<int, RentalViewModel> rentals)
+        private readonly IRentalService _rentalService;
+
+        public RentalsController(IDictionary<int, RentalViewModel> rentals, IRentalService rentalService)
         {
             _rentals = rentals;
+            _rentalService = rentalService;
         }
 
         [HttpGet]
@@ -29,16 +34,15 @@ namespace VacationRental.Api.Controllers
         [HttpPost]
         public ResourceIdViewModel Post(RentalBindingModel model)
         {
-            var key = new ResourceIdViewModel { Id = _rentals.Keys.Count + 1 };
+            //var key = new ResourceIdViewModel { Id = _rentals.Keys.Count + 1 };
 
-            _rentals.Add(key.Id, new RentalViewModel
-            {
-                Id = key.Id,
-                Units = model.Units,
-                PreparationTimeInDays = model.PreparationTimeInDays
-            });
-
-            return key;
+            //_rentals.Add(key.Id, new RentalViewModel
+            //{
+            //    Id = key.Id,
+            //    Units = model.Units,
+            //    PreparationTimeInDays = model.PreparationTimeInDays
+            //});
+            return _rentalService.CreateRental(model);
         }
     }
 }
