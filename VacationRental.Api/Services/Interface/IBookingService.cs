@@ -6,9 +6,9 @@ using VacationRental.Api.Models;
 
 namespace VacationRental.Api.Services.Interface
 {
-    public interface IRentalService
+    public interface IBookingService
     {
-        ResourceIdViewModel CreateRental(RentalBindingModel model);
-        RentalViewModel GetRental(int id);
+        ResourceIdViewModel CreateBooking(BookingBindingModel model);
+        BookingViewModel GetBooking(int id);
     }
 }

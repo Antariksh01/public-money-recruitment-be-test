@@ -14,6 +14,13 @@ namespace VacationRental.Api.Services
         {
             _rentals = rentals;
         }
+        public RentalViewModel GetRental(int id) {
+
+            if (!_rentals.ContainsKey(id))
+                throw new ApplicationException("Rental not found");
+
+            return _rentals[id];
+        }
         public ResourceIdViewModel CreateRental(RentalBindingModel model) {
 
             var key = new ResourceIdViewModel { Id = _rentals.Keys.Count + 1 };
