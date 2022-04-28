@@ -31,6 +31,7 @@ namespace VacationRental.Api
             services.AddSingleton<IDictionary<int, BookingViewModel>>(new Dictionary<int, BookingViewModel>());
             services.AddScoped<IRentalService, RentalService>();
             services.AddScoped<IBookingService, BookingService>();
+            services.AddScoped<ICalendarService, CalendarService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
