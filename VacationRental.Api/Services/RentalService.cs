@@ -34,5 +34,18 @@ namespace VacationRental.Api.Services
 
             return key;
         }
+
+        public RentalViewModel UpdateRental(RentalBindingModel model, int rentalId)
+        {
+            if (!_rentals.ContainsKey(rentalId))
+                throw new ApplicationException("Rental not found");
+
+            var rentalToUpdate = _rentals[rentalId];
+
+            rentalToUpdate.Units = model.Units;
+            rentalToUpdate.PreparationTimeInDays = model.PreparationTimeInDays;            
+
+            return rentalToUpdate;
+        }
     }
 }
