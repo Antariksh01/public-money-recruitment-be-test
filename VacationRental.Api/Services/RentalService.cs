@@ -35,7 +35,7 @@ namespace VacationRental.Api.Services
             return key;
         }
 
-        public RentalViewModel UpdateRental(RentalBindingModel model, int rentalId)
+        public RentalViewModel UpdateRental(int rentalId, RentalBindingModel model)
         {
             if (!_rentals.ContainsKey(rentalId))
                 throw new ApplicationException("Rental not found");
