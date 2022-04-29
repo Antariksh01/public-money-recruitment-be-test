@@ -31,7 +31,7 @@ namespace VacationRental.Api.Services
         {
 
             if (model.Nights <= 0)
-                throw new ApplicationException("Nigts must be positive");
+                throw new ApplicationException("Nights must be positive");
 
             var rental = _rentals.Values.FirstOrDefault(x => x.Id == model.RentalId);
             if (rental == null)

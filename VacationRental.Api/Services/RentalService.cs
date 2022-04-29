@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using VacationRental.Api.Models;
 using VacationRental.Api.Services.Interface;
 
@@ -22,6 +20,12 @@ namespace VacationRental.Api.Services
             return _rentals[id];
         }
         public ResourceIdViewModel CreateRental(RentalBindingModel model) {
+
+            if (model.Units <= 0) 
+               throw new ApplicationException("Rentals should have minimum 1 unit");
+
+            else if (model.PreparationTimeInDays < 0)
+                throw new ApplicationException("Preparation time cannot be negative");
 
             var key = new ResourceIdViewModel { Id = _rentals.Keys.Count + 1 };
 
