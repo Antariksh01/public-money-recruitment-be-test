@@ -27,7 +27,8 @@ namespace VacationRental.Api.Services
 
             return _bookings[id];
         }
-        public ResourceIdViewModel CreateBooking(BookingBindingModel model) {
+        public ResourceIdViewModel CreateBooking(BookingBindingModel model)
+        {
 
             if (model.Nights <= 0)
                 throw new ApplicationException("Nigts must be positive");
@@ -36,26 +37,8 @@ namespace VacationRental.Api.Services
             if (rental == null)
                 throw new ApplicationException("Rental not found");
 
-            int unitsAvailable = 1;
-
-            for (var i = 0; i < model.Nights; i++)
-            {
-                var count = 0;
-                foreach (var booking in _bookings.Values.Where(x => x.RentalId == model.RentalId))
-                {
-                    if ((booking.Start <= model.Start.Date && booking.Start.AddDays(booking.Nights + rental.PreparationTimeInDays) > model.Start.Date)
-                        || (booking.Start < model.Start.AddDays(model.Nights + rental.PreparationTimeInDays) && booking.Start.AddDays(booking.Nights) >= model.Start.AddDays(model.Nights))
-                        || (booking.Start > model.Start && booking.Start.AddDays(booking.Nights) < model.Start.AddDays(model.Nights)))
-                    {
-                        count++;
-                        unitsAvailable++;
-                    }
-                }
-                if (count >= _rentals[model.RentalId].Units)
-                    throw new ApplicationException("Not available");
-            }
-
-
+            var units = GetAvailableUnits(model, rental);
+           
             var key = new ResourceIdViewModel { Id = _bookings.Keys.Count + 1 };
 
             _bookings.Add(key.Id, new BookingViewModel
@@ -64,11 +47,52 @@ namespace VacationRental.Api.Services
                 Nights = model.Nights,
                 RentalId = model.RentalId,
                 Start = model.Start.Date,
-                Unit = unitsAvailable
+                Unit = units
             });
 
             return key;
 
         }
+
+        public int GetAvailableUnits(BookingBindingModel model, RentalViewModel rental)
+        {
+
+            int unitsAvailable = 1;
+
+            var bookings = _bookings.Values.Where(x => x.RentalId == model.RentalId && IsDateAvailable(x, model, rental));
+
+            if (bookings == null || !bookings.Any())
+            {
+                return unitsAvailable;
+            }
+
+
+            for (int i = unitsAvailable; i < rental.Units; i++)
+            {
+                if (bookings.All(x => x.Unit != i))
+                {
+                    return i;
+                }
+            }
+
+            throw new ApplicationException("Not Available");
+
+        }
+
+        public bool IsDateAvailable(BookingViewModel booking, BookingBindingModel model, RentalViewModel rental)
+        {
+
+            if ((booking.Start <= model.Start.Date && booking.Start.AddDays(booking.Nights + rental.PreparationTimeInDays) > model.Start.Date)
+                        || (booking.Start < model.Start.AddDays(model.Nights + rental.PreparationTimeInDays) && booking.Start.AddDays(booking.Nights) >= model.Start.AddDays(model.Nights))
+                        || (booking.Start > model.Start && booking.Start.AddDays(booking.Nights) < model.Start.AddDays(model.Nights)))
+            {
+                return true;
+            }
+
+            else
+                return false;
+
+        }
+
     }
 }
