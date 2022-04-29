@@ -21,46 +21,70 @@ namespace VacationRental.Api.Services
         }
         public CalendarViewModel GetCalendar(int rentalId, DateTime start, int nights)
         {
-
-            if (nights < 0)
-                throw new ApplicationException("Nights must be positive");
-            if (!_rentals.ContainsKey(rentalId))
-                throw new ApplicationException("Rental not found");
-
-            var rental = _rentals[rentalId];
-
-            var result = new CalendarViewModel
+            try
             {
-                RentalId = rentalId,
-                Dates = new List<CalendarDateViewModel>()
-            };
-            for (var i = 0; i < nights; i++)
-            {
-                var date = new CalendarDateViewModel
+
+                if (nights < 0)
+                    throw new ApplicationException("Nights must be positive");
+
+                if (!_rentals.ContainsKey(rentalId))
+                    throw new ApplicationException("Rental not found");
+
+                var rental = _rentals[rentalId];
+
+                var result = new CalendarViewModel
                 {
-                    Date = start.Date.AddDays(i),
-                    Bookings = new List<CalendarBookingViewModel>(),
-                    PreparationTimeInDays = new List<PreparationTimeViewModel>()
+                    RentalId = rentalId,
+                    Dates = new List<CalendarDateViewModel>()
                 };
 
-                foreach (var booking in _bookings.Values)
+                for (var i = 0; i < nights; i++)
                 {
-                    if (booking.RentalId == rentalId
-                        && booking.Start <= date.Date && booking.Start.AddDays(booking.Nights) > date.Date)
+                    var date = new CalendarDateViewModel
                     {
-                        date.Bookings.Add(new CalendarBookingViewModel { Id = booking.Id, Unit = booking.Unit });
-                    }
-                    else if (booking.RentalId == rentalId
-                               && booking.Start <= date.Date && booking.Start.AddDays(booking.Nights + rental.PreparationTimeInDays) > date.Date)
+                        Date = start.Date.AddDays(i),
+                        Bookings = new List<CalendarBookingViewModel>(),
+                        PreparationTimeInDays = new List<PreparationTimeViewModel>()
+                    };
+
+                    foreach (var booking in _bookings.Values)
                     {
-                        date.PreparationTimeInDays.Add(new PreparationTimeViewModel { Unit = booking.Unit });
+                        if (booking.RentalId == rentalId)
+                        {
+                            if (BookingOverlap(booking, date))
+                            {
+                                date.Bookings.Add(new CalendarBookingViewModel { Id = booking.Id, Unit = booking.Unit });
+                            }
+                            else if (PreparationOverlap(booking, date, rental))
+                            {
+                                date.PreparationTimeInDays.Add(new PreparationTimeViewModel { Unit = booking.Unit });
+                            }
+                        }
                     }
+
+                    result.Dates.Add(date);
                 }
 
-                result.Dates.Add(date);
+                return result;
             }
+            catch
+            {
+                throw;
+            }
+            
+        }
 
-            return result;
+        public bool BookingOverlap(BookingViewModel booking, CalendarDateViewModel date) {
+
+            return booking.Start <= date.Date && booking.Start.AddDays(booking.Nights) > date.Date;
+
+        }
+
+        public bool PreparationOverlap(BookingViewModel booking, CalendarDateViewModel date, RentalViewModel rental)
+        {
+
+            return booking.Start <= date.Date && booking.Start.AddDays(booking.Nights + rental.PreparationTimeInDays) > date.Date;
+
         }
     }
 

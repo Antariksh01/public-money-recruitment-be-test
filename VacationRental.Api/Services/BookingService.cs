@@ -67,7 +67,7 @@ namespace VacationRental.Api.Services
             }
 
 
-            for (int i = unitsAvailable; i < rental.Units; i++)
+            for (int i = unitsAvailable; i <= rental.Units; i++)
             {
                 if (bookings.All(x => x.Unit != i))
                 {
