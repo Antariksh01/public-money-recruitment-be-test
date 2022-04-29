@@ -107,7 +107,7 @@ namespace VacationRental.Api.Tests
             {
                 RentalId = postRentalResult.Id,
                 Nights = 3,
-                Start = DateTime.UtcNow
+                Start = DateTime.UtcNow.Date
             };
 
             using (var postBooking1Response = await _client.PostAsJsonAsync($"/api/v1/bookings", postBooking1Request))
@@ -119,7 +119,7 @@ namespace VacationRental.Api.Tests
             {
                 RentalId = postRentalResult.Id,
                 Nights = 1,
-                Start = DateTime.UtcNow
+                Start = DateTime.UtcNow.Date
             };
 
             await Assert.ThrowsAsync<ApplicationException>(async () =>
