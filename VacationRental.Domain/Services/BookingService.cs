@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
-using VacationRental.Api.Models;
-using VacationRental.Api.Services.Interface;
+using System.Text;
+using VacationRental.Domain.Exception;
+using VacationRental.Domain.Models;
+using VacationRental.Domain.Services.Interface;
 
-namespace VacationRental.Api.Services
+namespace VacationRental.Domain.Services
 {
     public class BookingService : IBookingService
     {
@@ -23,7 +24,7 @@ namespace VacationRental.Api.Services
         public BookingViewModel GetBooking(int id)
         {
             if (!_bookings.ContainsKey(id))
-                throw new ApplicationException("Booking not found");
+                throw new NotFoundException("Booking not found");
 
             return _bookings[id];
         }
@@ -31,14 +32,14 @@ namespace VacationRental.Api.Services
         {
 
             if (model.Nights <= 0)
-                throw new ApplicationException("Nights must be positive");
+                throw new ValidationException("Nights must be positive");
 
             var rental = _rentals.Values.FirstOrDefault(x => x.Id == model.RentalId);
             if (rental == null)
-                throw new ApplicationException("Rental not found");
+                throw new NotFoundException("Rental not found");
 
             var units = GetAvailableUnits(model, rental);
-           
+
             var key = new ResourceIdViewModel { Id = _bookings.Keys.Count + 1 };
 
             _bookings.Add(key.Id, new BookingViewModel

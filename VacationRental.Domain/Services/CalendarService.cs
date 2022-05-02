@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using VacationRental.Api.Models;
-using VacationRental.Api.Services.Interface;
+using System.Text;
+using VacationRental.Domain.Exception;
+using VacationRental.Domain.Models;
+using VacationRental.Domain.Services.Interface;
 
-namespace VacationRental.Api.Services
+namespace VacationRental.Domain.Services
 {
     public class CalendarService : ICalendarService
     {
@@ -25,10 +25,10 @@ namespace VacationRental.Api.Services
             {
 
                 if (nights < 0)
-                    throw new ApplicationException("Nights must be positive");
+                    throw new ValidationException("Nights must be positive");
 
                 if (!_rentals.ContainsKey(rentalId))
-                    throw new ApplicationException("Rental not found");
+                    throw new NotFoundException("Rental not found");
 
                 var rental = _rentals[rentalId];
 
@@ -71,10 +71,11 @@ namespace VacationRental.Api.Services
             {
                 throw;
             }
-            
+
         }
 
-        public bool BookingOverlap(BookingViewModel booking, CalendarDateViewModel date) {
+        public bool BookingOverlap(BookingViewModel booking, CalendarDateViewModel date)
+        {
 
             return booking.Start <= date.Date && booking.Start.AddDays(booking.Nights) > date.Date;
 
@@ -87,5 +88,4 @@ namespace VacationRental.Api.Services
 
         }
     }
-
 }

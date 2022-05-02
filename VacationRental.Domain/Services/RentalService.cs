@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using VacationRental.Api.Models;
-using VacationRental.Api.Services.Interface;
+using System.Text;
+using VacationRental.Domain.Exception;
+using VacationRental.Domain.Models;
+using VacationRental.Domain.Services.Interface;
 
-namespace VacationRental.Api.Services
+namespace VacationRental.Domain.Services
 {
     public class RentalService : IRentalService
     {
@@ -12,20 +14,22 @@ namespace VacationRental.Api.Services
         {
             _rentals = rentals;
         }
-        public RentalViewModel GetRental(int id) {
+        public RentalViewModel GetRental(int id)
+        {
 
             if (!_rentals.ContainsKey(id))
-                throw new ApplicationException("Rental not found");
+                throw new NotFoundException("Rental not found");
 
             return _rentals[id];
         }
-        public ResourceIdViewModel CreateRental(RentalBindingModel model) {
+        public ResourceIdViewModel CreateRental(RentalBindingModel model)
+        {
 
-            if (model.Units <= 0) 
-               throw new ApplicationException("Rentals should have minimum 1 unit");
+            if (model.Units <= 0)
+                throw new ValidationException("Rentals should have minimum 1 unit");
 
             else if (model.PreparationTimeInDays < 0)
-                throw new ApplicationException("Preparation time cannot be negative");
+                throw new ValidationException("Preparation time cannot be negative");
 
             var key = new ResourceIdViewModel { Id = _rentals.Keys.Count + 1 };
 
@@ -47,7 +51,7 @@ namespace VacationRental.Api.Services
             var rentalToUpdate = _rentals[rentalId];
 
             rentalToUpdate.Units = model.Units;
-            rentalToUpdate.PreparationTimeInDays = model.PreparationTimeInDays;            
+            rentalToUpdate.PreparationTimeInDays = model.PreparationTimeInDays;
 
             return rentalToUpdate;
         }
